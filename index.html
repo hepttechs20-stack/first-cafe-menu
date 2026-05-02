@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>First Cafe Digital Menu</title>
+    <!-- Google Fonts for a clean look -->
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
+    <style>
+        body { font-family: 'Poppins', sans-serif; margin: 0; background-color: #f8f9fa; color: #333; }
+        header { background: #2c3e50; color: white; padding: 1.5rem; text-align: center; position: sticky; top: 0; z-index: 100; }
+        .lang-switch { margin-top: 10px; }
+        .btn-lang { background: transparent; border: 1px solid white; color: white; padding: 5px 15px; cursor: pointer; border-radius: 20px; }
+        .btn-lang:hover { background: white; color: #2c3e50; }
+        
+        #categories { display: flex; overflow-x: auto; padding: 10px; background: white; gap: 10px; border-bottom: 1px solid #eee; }
+        .cat-btn { white-space: nowrap; padding: 8px 20px; border-radius: 20px; border: 1px solid #2c3e50; background: white; cursor: pointer; }
+        .cat-btn.active { background: #2c3e50; color: white; }
+
+        .menu-container { padding: 15px; max-width: 600px; margin: auto; }
+        .item-card { background: white; border-radius: 12px; padding: 15px; margin-bottom: 15px; box-shadow: 0 2px 5px rgba(0,0,0,0.05); display: flex; justify-content: space-between; align-items: center; }
+        .details h3 { margin: 0; font-size: 1.1rem; }
+        .ingredients { font-size: 0.85rem; color: #777; margin: 5px 0; }
+        .price { font-weight: 600; color: #27ae60; font-size: 1.1rem; }
+    </style>
+</head>
+<body>
+
+<header>
+    <h1 id="cafe-name">First Cafe Menu</h1>
+    <div class="lang-switch">
+        <button class="btn-lang" onclick="switchLang('en')">English</button>
+        <button class="btn-lang" onclick="switchLang('am')">አማርኛ</button>
+    </div>
+</header>
+
+<div id="categories">
+    <button class="cat-btn active" onclick="filterMenu('All')">All</button>
+    <!-- Categories will be injected here -->
+</div>
+
+<div class="menu-container" id="menu-list">
+    <!-- Items will be injected here -->
+</div>
+
+<script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/9.1.0/firebase-app.js";
+    import { getFirestore, collection, getDocs } from "https://www.gstatic.com/firebasejs/9.1.0/firebase-firestore.js";
+
+    const firebaseConfig = {
+        apiKey: "AIzaSyAHecBi1rAHRZLDvspa1P1P358LEqwF9kU",
+        authDomain: "firstcafe.firebaseapp.com",
+        projectId: "firstcafe",
+        storageBucket: "firstcafe.firebasestorage.app",
+        messagingSenderId: "695475447870",
+        appId: "1:695475447870:web:25486f48051faa41fb096f"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const db = getFirestore(app);
+    let allItems = [];
+    let currentLang = 'en';
+
+    async function fetchMenu() {
+        const querySnapshot = await getDocs(collection(db, "menu_items"));
+        allItems = querySnapshot.docs.map(doc => doc.data());
+        renderCategories();
+        renderMenu('All');
+    }
+
+    function renderCategories() {
+        const catContainer = document.getElementById('categories');
+        const uniqueCats = [...new Set(allItems.map(item => item.category))];
+        uniqueCats.forEach(cat => {
+            const btn = document.createElement('button');
+            btn.className = 'cat-btn';
+            btn.innerText = cat;
+            btn.onclick = () => filterMenu(cat);
+            catContainer.appendChild(btn);
+        });
+    }
+
+    window.filterMenu = (category) => {
+        document.querySelectorAll('.cat-btn').forEach(btn => btn.classList.remove('active'));
+        event.target.classList.add('active');
+        renderMenu(category);
+    };
+
+    window.switchLang = (lang) => {
+        currentLang = lang;
+        document.getElementById('cafe-name').innerText = lang === 'en' ? "First Cafe Menu" : "ፈረስት ካፌ ሜኑ";
+        const activeCat = document.querySelector('.cat-btn.active').innerText;
+        renderMenu(activeCat);
+    };
+
+    function renderMenu(category) {
+        const list = document.getElementById('menu-list');
+        list.innerHTML = "";
+        
+        const filtered = category === 'All' ? allItems : allItems.filter(i => i.category === category);
+
+        filtered.forEach(item => {
+            list.innerHTML += `
+                <div class="item-card">
+                    <div class="details">
+                        <h3>${currentLang === 'en' ? item.name_en : item.name_am}</h3>
+                        <p class="ingredients">${currentLang === 'en' ? item.ingredients_en : item.ingredients_am}</p>
+                    </div>
+                    <div class="price">${item.price} ETB</div>
+                </div>
+            `;
+        });
+    }
+
+    fetchMenu();
+</script>
+
+</body>
+</html>
