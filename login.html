@@ -3,35 +3,122 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Login - First Cafe Admin</title>
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
+    <title>Admin Login | First Cafe</title>
     <style>
-        body { font-family: 'Poppins', sans-serif; background: #f0f2f5; display: flex; justify-content: center; align-items: center; height: 100vh; margin: 0; }
-        .login-card { background: white; padding: 30px; border-radius: 10px; box-shadow: 0 4px 15px rgba(0,0,0,0.1); width: 100%; max-width: 400px; box-sizing: border-box; }
-        h2 { border-bottom: 2px solid #2c3e50; padding-bottom: 10px; margin-top: 0; color: #2c3e50; text-align: center; }
-        input { width: 100%; padding: 12px; margin: 10px 0; border: 1px solid #ddd; border-radius: 5px; box-sizing: border-box; font-size: 1rem; }
-        button { background: #2c3e50; color: white; border: none; padding: 12px; border-radius: 5px; cursor: pointer; width: 100%; font-size: 1rem; margin-top: 10px; font-weight: 600; }
-        button:hover { opacity: 0.9; }
-        .error-msg { color: #e74c3c; font-size: 0.9rem; text-align: center; margin-top: 10px; display: none; }
+        :root {
+            --bg: #ffffff;
+            --card-bg: #f9f9f9;
+            --gold: #b8860b;
+            --text: #1a1a1a;
+            --border: #eee;
+            --input-bg: #f0f0f0;
+            --input-text: #1a1a1a;
+            --btn-text: white;
+        }
+
+        .dark-mode {
+            --bg: #121212;
+            --card-bg: #1e1e1e;
+            --gold: #d4af37;
+            --text: #f5f5f5;
+            --border: #333;
+            --input-bg: #262626;
+            --input-text: white;
+            --btn-text: #121212;
+        }
+
+        body {
+            font-family: sans-serif;
+            background: var(--bg);
+            color: var(--text);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+            transition: 0.3s;
+        }
+
+        .login-card {
+            background: var(--card-bg);
+            padding: 40px 30px;
+            border-radius: 15px;
+            width: 100%;
+            max-width: 400px;
+            border: 1px solid var(--border);
+            box-shadow: 0 4px 15px rgba(0,0,0,0.05);
+            transition: 0.3s;
+            box-sizing: border-box;
+        }
+
+        h2 { color: var(--gold); text-align: center; margin-bottom: 25px; }
+
+        input {
+            width: 100%;
+            padding: 12px;
+            margin: 10px 0;
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            box-sizing: border-box;
+            background: var(--input-bg);
+            color: var(--input-text);
+            transition: 0.3s;
+        }
+
+        button {
+            background: var(--gold);
+            color: var(--btn-text);
+            border: none;
+            padding: 15px;
+            width: 100%;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: bold;
+            margin-top: 15px;
+            font-size: 1rem;
+        }
+
+        .error-msg {
+            color: #e74c3c;
+            font-size: 0.85rem;
+            text-align: center;
+            margin-top: 10px;
+            display: none;
+        }
+
+        .theme-btn-fixed {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            background: var(--gold);
+            color: var(--btn-text);
+            border: none;
+            border-radius: 50%;
+            width: 50px;
+            height: 50px;
+            cursor: pointer;
+            z-index: 2000;
+            font-size: 1.2rem;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+        }
     </style>
 </head>
 <body>
 
 <div class="login-card">
-    <h2>First Cafe Portal</h2>
-    <form id="login-form">
-        <input type="email" id="email" placeholder="Admin Email" required>
-        <input type="password" id="password" placeholder="Password" required>
-        <button type="submit">Sign In</button>
-    </form>
-    <div class="error-msg" id="error-message">Invalid email or password.</div>
+    <h2>First Cafe Admin</h2>
+    <input type="email" id="email" placeholder="Admin Email" value="admin@firstcafe.com">
+    <input type="password" id="password" placeholder="Password">
+    <button onclick="login()">SIGN IN</button>
+    <div class="error-msg" id="error-box"></div>
 </div>
+
+<button class="theme-btn-fixed" onclick="toggleTheme()">🌓</button>
 
 <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/9.1.0/firebase-app.js";
     import { getAuth, signInWithEmailAndPassword } from "https://www.gstatic.com/firebasejs/9.1.0/firebase-auth.js";
 
-    // Your Firebase Config
     const firebaseConfig = {
         apiKey: "AIzaSyAHecBi1rAHRZLDvspa1P1P358LEqwF9kU",
         authDomain: "firstcafe.firebaseapp.com",
@@ -44,26 +131,24 @@
     const app = initializeApp(firebaseConfig);
     const auth = getAuth(app);
 
-    const loginForm = document.getElementById('login-form');
-    const errorDiv = document.getElementById('error-message');
+    window.toggleTheme = () => document.body.classList.toggle('dark-mode');
 
-    loginForm.addEventListener('submit', async (e) => {
-        e.preventDefault();
-        errorDiv.style.display = 'none';
-
+    window.login = async () => {
         const email = document.getElementById('email').value;
         const password = document.getElementById('password').value;
+        const errorBox = document.getElementById('error-box');
+        
+        errorBox.style.display = "none";
 
         try {
-            // Check credentials against Firebase Auth
             await signInWithEmailAndPassword(auth, email, password);
-            // Redirect to your admin page upon successful validation
-            window.location.href = "admin.html"; 
+            // On success, redirect to the admin panel
+            window.location.href = "admin.html";
         } catch (error) {
-            console.error("Login failed:", error.message);
-            errorDiv.style.display = 'block';
+            errorBox.innerText = "Invalid credentials. Please try again.";
+            errorBox.style.display = "block";
         }
-    });
+    };
 </script>
 </body>
 </html>
