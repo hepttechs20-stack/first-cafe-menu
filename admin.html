@@ -38,7 +38,7 @@
             padding: 20px; 
             transition: 0.3s;
             padding-bottom: 80px;
-            display: none; /* Hidden until auth state checks out */
+            display: none; 
         }
         
         .form-card { 
@@ -66,6 +66,20 @@
             cursor: pointer;
             font-weight: bold;
             font-size: 0.8rem;
+        }
+
+        /* "Add New Item instead" button hidden by default until edit mode runs */
+        #new-item-toggle-btn {
+            display: none;
+            background: #27ae60;
+            color: white;
+            border: none;
+            padding: 8px 12px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-weight: bold;
+            font-size: 0.8rem;
+            margin: 0 auto 15px auto;
         }
 
         input, select, textarea { 
@@ -135,9 +149,6 @@
             cursor: pointer;
         }
         
-        #progress-container { width: 100%; height: 8px; background: var(--border); border-radius: 4px; display: none; margin: 10px 0; }
-        #progress-bar { height: 100%; background: var(--gold); width: 0%; border-radius: 4px; }
-        
         .theme-btn-fixed { 
             position: fixed; 
             bottom: 20px; 
@@ -159,7 +170,12 @@
 
 <div class="form-card">
     <button class="logout-btn" onclick="logout()">LOGOUT</button>
-    <h2 id="form-title">Menu Management</h2>
+    <h2 id="form-title">Add New Menu Item</h2>
+    
+    <div style="text-align: center;">
+        <button id="new-item-toggle-btn" onclick="clearToAddNewMode()">➕ Add New Item instead</button>
+    </div>
+
     <input type="hidden" id="edit-id">
     <input type="text" id="name_en" placeholder="Item Name (English)">
     <input type="text" id="name_am" placeholder="Item Name (Amharic)">
@@ -172,9 +188,9 @@
     <input type="number" id="price" placeholder="Price (ETB)">
     <textarea id="ing_en" placeholder="Ingredients (English)"></textarea>
     <textarea id="ing_am" placeholder="Ingredients (Amharic)"></textarea>
-    <input type="file" id="photo">
-    <div id="progress-container"><div id="progress-bar"></div></div>
-    <input type="hidden" id="current-img">
+    
+    <input type="text" id="image_url_input" placeholder="Paste Image Direct URL Link (e.g., https://site.com/image.jpg)">
+    
     <div style="margin: 10px 0;"><input type="checkbox" id="is_available" checked style="width:auto;"> Available in Stock</div>
     <button id="save-btn" onclick="saveItem()">SAVE ITEM</button>
 </div>
@@ -187,7 +203,6 @@
     import { initializeApp } from "https://www.gstatic.com/firebasejs/9.1.0/firebase-app.js";
     import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/9.1.0/firebase-auth.js";
     import { getFirestore, collection, addDoc, onSnapshot, deleteDoc, doc, updateDoc } from "https://www.gstatic.com/firebasejs/9.1.0/firebase-firestore.js";
-    import { getStorage, ref, uploadBytesResumable, getDownloadURL } from "https://www.gstatic.com/firebasejs/9.1.0/firebase-storage.js";
 
     const firebaseConfig = {
         apiKey: "AIzaSyAHecBi1rAHRZLDvspa1P1P358LEqwF9kU",
@@ -201,44 +216,41 @@
     const app = initializeApp(firebaseConfig);
     const auth = getAuth(app);
     const db = getFirestore(app);
-    const storage = getStorage(app);
 
-    // Security Gate: Ensure user is authorized to view this page
     onAuthStateChanged(auth, (user) => {
         if (user && user.email === "admin@firstcafe.com") {
-            document.body.style.display = "block"; // Show page if authorized
+            document.body.style.display = "block";
         } else {
-            window.location.href = "login.html"; // Redirect if unauthorized
+            window.location.href = "login.html";
         }
     });
 
     window.logout = () => {
-        signOut(auth).then(() => {
-            window.location.href = "login.html";
-        });
+        signOut(auth).then(() => { window.location.href = "login.html"; });
     };
 
     window.toggleTheme = () => document.body.classList.toggle('dark-mode');
 
-    window.saveItem = async () => {
-        const file = document.getElementById('photo').files[0];
-        const editId = document.getElementById('edit-id').value;
-        let url = document.getElementById('current-img').value;
+    window.clearToAddNewMode = () => {
+        document.getElementById('edit-id').value = "";
+        document.getElementById('name_en').value = "";
+        document.getElementById('name_am').value = "";
+        document.getElementById('main_category').value = "Food";
+        document.getElementById('sub_category').value = "";
+        document.getElementById('price').value = "";
+        document.getElementById('ing_en').value = "";
+        document.getElementById('ing_am').value = "";
+        document.getElementById('image_url_input').value = "";
+        document.getElementById('is_available').checked = true;
+        
+        document.getElementById('form-title').innerText = "Add New Menu Item";
+        document.getElementById('save-btn').innerText = "SAVE ITEM";
+        document.getElementById('new-item-toggle-btn').style.display = "none";
+    };
 
-        if (file) {
-            const storageRef = ref(storage, 'menu/' + Date.now() + "_" + file.name);
-            const uploadTask = uploadBytesResumable(storageRef, file);
-            document.getElementById('progress-container').style.display = 'block';
-            
-            await new Promise((resolve) => {
-                uploadTask.on('state_changed', (snapshot) => {
-                    document.getElementById('progress-bar').style.width = (snapshot.bytesTransferred / snapshot.totalBytes) * 100 + '%';
-                }, null, async () => {
-                    url = await getDownloadURL(uploadTask.snapshot.ref);
-                    resolve();
-                });
-            });
-        }
+    window.saveItem = async () => {
+        const editId = document.getElementById('edit-id').value;
+        const imgUrl = document.getElementById('image_url_input').value;
 
         const data = {
             name_en: document.getElementById('name_en').value,
@@ -248,15 +260,18 @@
             price: Number(document.getElementById('price').value),
             ing_en: document.getElementById('ing_en').value,
             ing_am: document.getElementById('ing_am').value,
-            image_url: url,
+            image_url: imgUrl,
             is_available: document.getElementById('is_available').checked
         };
 
-        if (editId) await updateDoc(doc(db, "menu_items", editId), data);
-        else await addDoc(collection(db, "menu_items"), data);
-
-        alert("Database Updated!");
-        location.reload();
+        if (editId) {
+            await updateDoc(doc(db, "menu_items", editId), data);
+            alert("Item Updated Successfully!");
+        } else {
+            await addDoc(collection(db, "menu_items"), data);
+            alert("New Item Added Successfully!");
+        }
+        clearToAddNewMode();
     };
 
     onSnapshot(collection(db, "menu_items"), (snap) => {
@@ -283,13 +298,16 @@
         document.getElementById('price').value = item.price;
         document.getElementById('ing_en').value = item.ing_en;
         document.getElementById('ing_am').value = item.ing_am;
-        document.getElementById('current-img').value = item.image_url;
+        document.getElementById('image_url_input').value = item.image_url;
         document.getElementById('is_available').checked = item.is_available;
-        document.getElementById('save-btn').innerText = "UPDATE ITEM";
-        window.scrollTo(0,0);
+        
+        document.getElementById('form-title').innerText = "Update Item Entry";
+        document.getElementById('save-btn').innerText = "UPDATE ITEM CHANGES";
+        document.getElementById('new-item-toggle-btn').style.display = "inline-block";
+        window.scrollTo({ top: 0, behavior: 'smooth' });
     };
 
-    window.deleteItem = async (id) => { if(confirm("Permanently delete?")) await deleteDoc(doc(db, "menu_items", id)); };
+    window.deleteItem = async (id) => { if(confirm("Permanently delete?")) await deleteDoc(doc(db, "doc", id)); };
 </script>
 </body>
 </html>
