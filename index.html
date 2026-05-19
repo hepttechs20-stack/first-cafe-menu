@@ -7,16 +7,6 @@
     <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700&family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
     <style>
         :root {
-            --bg: #121212;
-            --card-bg: #1e1e1e;
-            --gold: #d4af37;
-            --text: #f5f5f5;
-            --border: #333;
-            --input-bg: #1a1a1a;
-            --modal-overlay: rgba(0,0,0,0.9);
-        }
-
-        .light-mode {
             --bg: #ffffff;
             --card-bg: #f9f9f9;
             --gold: #b8860b;
@@ -24,6 +14,16 @@
             --border: #eee;
             --input-bg: #f0f0f0;
             --modal-overlay: rgba(255,255,255,0.95);
+        }
+
+        .dark-mode {
+            --bg: #121212;
+            --card-bg: #1e1e1e;
+            --gold: #d4af37;
+            --text: #f5f5f5;
+            --border: #333;
+            --input-bg: #1a1a1a;
+            --modal-overlay: rgba(0,0,0,0.9);
         }
 
         body { font-family: 'Poppins', sans-serif; margin: 0; background: var(--bg); color: var(--text); transition: 0.3s; padding-bottom: 50px; }
@@ -39,23 +39,23 @@
             100% { transform: translateX(0); }
         }
 
-        /* Brand Text Overlay Style */
+        /* INCREASED BRAND TEXT OVERLAY SIZE */
         .slider-overlay-text {
             position: absolute;
             bottom: 0;
             left: 0;
             width: 100%;
-            padding: 20px 0 10px 0;
+            padding: 30px 0 15px 0;
             text-align: center;
             font-family: 'Playfair Display', serif;
             color: var(--gold);
-            font-size: 1.8rem;
-            letter-spacing: 2px;
+            font-size: 2.4rem; /* Increased size significantly */
+            letter-spacing: 3px;
             font-weight: 700;
-            /* Gradient background ensures readability against light images */
-            background: linear-gradient(to top, rgba(18, 18, 18, 0.85), rgba(18, 18, 18, 0));
+            text-shadow: 0 2px 10px rgba(0, 0, 0, 0.5); /* Shadow added for readability */
+            background: linear-gradient(to top, rgba(18, 18, 18, 0.9), rgba(18, 18, 18, 0));
             z-index: 10;
-            pointer-events: none; /* Allows clicks to pass through if necessary */
+            pointer-events: none;
         }
 
         header { padding: 15px; text-align: center; position: sticky; top: 0; z-index: 1000; background: var(--bg); border-bottom: 1px solid var(--border); }
@@ -71,23 +71,35 @@
         .tab { cursor: pointer; padding: 6px 15px; border-radius: 20px; font-size: 0.8rem; border: 1px solid var(--border); color: #888; }
         .tab.active { color: var(--bg); background: var(--gold); border-color: var(--gold); }
 
-        .menu-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; padding: 15px; }
-        .item-card { background: var(--card-bg); border-radius: 15px; overflow: hidden; border: 1px solid var(--border); cursor: pointer; }
+        /* MINIMIZED ITEM CARDS: Grid changed to 3 columns */
+        .menu-grid { 
+            display: grid; 
+            grid-template-columns: repeat(3, 1fr); /* 3 items per row instead of 2 */
+            gap: 10px; 
+            padding: 10px; 
+        }
+        
+        .item-card { background: var(--card-bg); border-radius: 12px; overflow: hidden; border: 1px solid var(--border); cursor: pointer; transition: transform 0.2s; }
+        .item-card:active { transform: scale(0.97); }
         .item-img { width: 100%; aspect-ratio: 1/1; object-fit: cover; }
-        .item-info { padding: 10px; }
-        .price { color: var(--gold); font-weight: 700; font-size: 0.9rem; }
+        
+        /* Adjusted padding and font sizes for smaller layout */
+        .item-info { padding: 8px; text-align: center; }
+        .item-info h3 { margin: 0 0 4px 0; font-size: 0.8rem; font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+        .price { color: var(--gold); font-weight: 700; font-size: 0.75rem; }
 
         /* Modal Styles */
-        .modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: var(--modal-overlay); z-index: 3000; justify-content: center; align-items: center; padding: 20px; box-sizing: border-box; }
+        .modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: var(--modal-overlay); z-index: 3000; justify-content: center; align-items: center; padding: 20px; box-box-sizing: border-box; }
         .modal-content { background: var(--card-bg); width: 100%; max-width: 400px; border-radius: 20px; overflow: hidden; border: 1px solid var(--gold); position: relative; }
         .modal-img { width: 100%; height: 250px; object-fit: cover; }
         .modal-body { padding: 20px; }
         .close-modal { position: absolute; top: 15px; right: 15px; background: var(--gold); color: #000; border: none; border-radius: 50%; width: 30px; height: 30px; cursor: pointer; font-weight: bold; }
 
-        .theme-btn-fixed { position: fixed; bottom: 20px; right: 20px; background: var(--gold); color: #000; border: none; border-radius: 50%; width: 50px; height: 50px; cursor: pointer; z-index: 2000; font-size: 1.2rem; box-shadow: 0 4px 10px rgba(0,0,0,0.3); }
+        .theme-btn-fixed { position: fixed; bottom: 20px; right: 20px; background: var(--gold); color: #fff; border: none; border-radius: 50%; width: 50px; height: 50px; cursor: pointer; z-index: 2000; font-size: 1.2rem; box-shadow: 0 4px 10px rgba(0,0,0,0.1); }
+        .dark-mode .theme-btn-fixed { color: #121212; }
     </style>
 </head>
-<body class="light-mode">
+<body>
 
 <div class="slider-container">
     <div class="slider">
@@ -126,8 +138,8 @@
         <button class="close-modal" onclick="closeModal()">×</button>
         <img id="modal-img" class="modal-img" src="">
         <div class="modal-body">
-            <h2 id="modal-title" style="margin: 0; color: var(--gold);"></h2>
-            <p id="modal-price" class="price" style="font-size: 1.2rem; margin: 10px 0;"></p>
+            <h2 id="modal-title" style="margin: 0; color: var(--gold); font-family: 'Playfair Display', serif;"></h2>
+            <p id="modal-price" style="font-size: 1.2rem; margin: 10px 0; color: var(--gold); font-weight:700;"></p>
             <h4 style="margin-bottom: 5px;">Ingredients:</h4>
             <p id="modal-ingredients" style="font-size: 0.9rem; color: #aaa;"></p>
         </div>
@@ -160,7 +172,7 @@
         renderItems();
     });
 
-    window.toggleTheme = () => document.body.classList.toggle('light-mode');
+    window.toggleTheme = () => document.body.classList.toggle('dark-mode');
     window.toggleLang = () => { lang = lang === 'en' ? 'am' : 'en'; document.getElementById('lang-label').innerText = lang.toUpperCase(); renderItems(); };
     window.toggleCurrency = () => { currency = currency === 'ETB' ? 'USD' : 'ETB'; document.getElementById('curr-label').innerText = currency; renderItems(); };
     window.setMainCat = (cat, el) => { currentMain = cat; document.querySelectorAll('.tab').forEach(t => t.classList.remove('active')); el.classList.add('active'); renderItems(); };
