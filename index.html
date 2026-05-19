@@ -17,11 +17,33 @@
         .cat-btn { white-space: nowrap; padding: 8px 20px; border-radius: 20px; border: 1px solid #2c3e50; background: white; cursor: pointer; }
         .cat-btn.active { background: #2c3e50; color: white; }
 
-        .menu-container { padding: 15px; max-width: 600px; margin: auto; }
-        .item-card { background: white; border-radius: 12px; padding: 15px; margin-bottom: 15px; box-shadow: 0 2px 5px rgba(0,0,0,0.05); display: flex; justify-content: space-between; align-items: center; }
+        /* --- CHANGED: TWO-COLUMN GRID LAYOUT --- */
+        .menu-container { 
+            padding: 15px; 
+            max-width: 900px; /* Increased max-width slightly to breathe better in 2 columns */
+            margin: auto; 
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); /* Automatically drops to 1 column on tiny phones */
+            gap: 15px; /* Adds space horizontally and vertically between cards */
+        }
+        
+        /* --- CHANGED: CARD FLEX MODIFICATIONS --- */
+        .item-card { 
+            background: white; 
+            border-radius: 12px; 
+            padding: 15px; 
+            box-shadow: 0 2px 5px rgba(0,0,0,0.05); 
+            display: flex; 
+            flex-direction: column; /* Stack details above price nicely within the smaller card width */
+            justify-content: space-between; 
+            align-items: flex-start; 
+            box-sizing: border-box;
+        }
+        
+        .details { width: 100%; }
         .details h3 { margin: 0; font-size: 1.1rem; }
-        .ingredients { font-size: 0.85rem; color: #777; margin: 5px 0; }
-        .price { font-weight: 600; color: #27ae60; font-size: 1.1rem; }
+        .ingredients { font-size: 0.85rem; color: #777; margin: 5px 0 15px 0; min-height: 40px; } /* Min-height keeps column pairs aligned */
+        .price { font-weight: 600; color: #27ae60; font-size: 1.1rem; align-self: flex-end; } /* Pushes price tag cleanly to bottom-right */
     </style>
 </head>
 <body>
