@@ -11,6 +11,7 @@
             --card-bg: #f9f9f9;
             --gold: #b8860b;
             --text: #1a1a1a;
+            --muted-text: #666;
             --border: #eee;
             --input-bg: #f0f0f0;
             --modal-overlay: rgba(255,255,255,0.95);
@@ -21,6 +22,7 @@
             --card-bg: #1e1e1e;
             --gold: #d4af37;
             --text: #f5f5f5;
+            --muted-text: #aaa;
             --border: #333;
             --input-bg: #1a1a1a;
             --modal-overlay: rgba(0,0,0,0.9);
@@ -39,7 +41,6 @@
             100% { transform: translateX(0); }
         }
 
-        /* INCREASED BRAND TEXT OVERLAY SIZE */
         .slider-overlay-text {
             position: absolute;
             bottom: 0;
@@ -49,10 +50,10 @@
             text-align: center;
             font-family: 'Playfair Display', serif;
             color: var(--gold);
-            font-size: 2.4rem; /* Increased size significantly */
+            font-size: 2.4rem;
             letter-spacing: 3px;
             font-weight: 700;
-            text-shadow: 0 2px 10px rgba(0, 0, 0, 0.5); /* Shadow added for readability */
+            text-shadow: 0 2px 10px rgba(0, 0, 0, 0.5);
             background: linear-gradient(to top, rgba(18, 18, 18, 0.9), rgba(18, 18, 18, 0));
             z-index: 10;
             pointer-events: none;
@@ -71,10 +72,10 @@
         .tab { cursor: pointer; padding: 6px 15px; border-radius: 20px; font-size: 0.8rem; border: 1px solid var(--border); color: #888; }
         .tab.active { color: var(--bg); background: var(--gold); border-color: var(--gold); }
 
-        /* MINIMIZED ITEM CARDS: Grid changed to 3 columns */
+        /* Menu Grid */
         .menu-grid { 
             display: grid; 
-            grid-template-columns: repeat(3, 1fr); /* 3 items per row instead of 2 */
+            grid-template-columns: repeat(3, 1fr);
             gap: 10px; 
             padding: 10px; 
         }
@@ -83,13 +84,23 @@
         .item-card:active { transform: scale(0.97); }
         .item-img { width: 100%; aspect-ratio: 1/1; object-fit: cover; }
         
-        /* Adjusted padding and font sizes for smaller layout */
         .item-info { padding: 8px; text-align: center; }
-        .item-info h3 { margin: 0 0 4px 0; font-size: 0.8rem; font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+        .item-info h3 { margin: 0 0 2px 0; font-size: 0.8rem; font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+        
+        /* ONE LINE INGREDIENT STYLE */
+        .item-ingredients-preview { 
+            margin: 0 0 4px 0; 
+            font-size: 0.65rem; 
+            color: var(--muted-text);
+            white-space: nowrap; 
+            overflow: hidden; 
+            text-overflow: ellipsis; /* Forces string into 1 clean line with ... if it overflows */
+        }
+
         .price { color: var(--gold); font-weight: 700; font-size: 0.75rem; }
 
         /* Modal Styles */
-        .modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: var(--modal-overlay); z-index: 3000; justify-content: center; align-items: center; padding: 20px; box-box-sizing: border-box; }
+        .modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: var(--modal-overlay); z-index: 3000; justify-content: center; align-items: center; padding: 20px; box-sizing: border-box; }
         .modal-content { background: var(--card-bg); width: 100%; max-width: 400px; border-radius: 20px; overflow: hidden; border: 1px solid var(--gold); position: relative; }
         .modal-img { width: 100%; height: 250px; object-fit: cover; }
         .modal-body { padding: 20px; }
@@ -141,7 +152,7 @@
             <h2 id="modal-title" style="margin: 0; color: var(--gold); font-family: 'Playfair Display', serif;"></h2>
             <p id="modal-price" style="font-size: 1.2rem; margin: 10px 0; color: var(--gold); font-weight:700;"></p>
             <h4 style="margin-bottom: 5px;">Ingredients:</h4>
-            <p id="modal-ingredients" style="font-size: 0.9rem; color: #aaa;"></p>
+            <p id="modal-ingredients" style="font-size: 0.9rem; color: var(--muted-text);"></p>
         </div>
     </div>
 </div>
@@ -199,6 +210,7 @@
                 <img src="${item.image_url}" class="item-img">
                 <div class="item-info">
                     <h3>${name}</h3>
+                    <p class="item-ingredients-preview">${ing || "..."}</p>
                     <div class="price">${p} ${currency}</div>
                 </div>`;
             display.appendChild(card);
